@@ -50,9 +50,7 @@ $active_record = TRUE;
 
 $db['default'] = array(
     'hostname' => 'localhost',
-    'username' => '',
-    'password' => '',
-    'database' => '',
+    'database' => 'dealsheets',
     'dbdriver' => 'mysql',
     'dbprefix' => '',
     'pconnect' => TRUE,
@@ -66,6 +64,8 @@ $db['default'] = array(
     'stricton' => FALSE
 );
 
-
+//db username/passwords outside of repository and web directory
+require_once('/var/auths/ds_ci.php');
+            
 /* End of file database.php */
 /* Location: ./application/config/database.php */
