@@ -369,10 +369,10 @@ abstract class REST_Controller extends CI_Controller
 		}
 
 		// If data is empty but http code provided, keep the output empty
-		else if (empty($data) && is_numeric($http_code))
+		else if (empty($data) && !is_array($data) && is_numeric($http_code))
 		{
-			$output = NULL;
-		}
+			$output = NULL;                                
+                }
 
 		// Otherwise (if no data but 200 provided) or some data, carry on camping!
 		else
@@ -406,7 +406,7 @@ abstract class REST_Controller extends CI_Controller
 				// Set the correct format header
 				header('Content-Type: '.$this->_supported_formats[$this->response->format]);
 
-				$output = $this->format->factory($data)->{'to_'.$this->response->format}();
+                                $output = $this->format->factory($data)->{'to_'.$this->response->format}();
 			}
 
 			// Format not supported, output directly
