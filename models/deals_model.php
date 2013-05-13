@@ -11,7 +11,7 @@ class deals_model extends CI_Model {
         if( empty($args['value']) ){
             return false;
         }
-        
+        print_r($args);
         switch($args['field']){
             case 'deal_stage':
                 return $this->db->
@@ -27,16 +27,6 @@ class deals_model extends CI_Model {
                 return $this->db->
                 where('id',$args['deal_id'])->
                 update('deals',array('created_date'=>$args['value']));
-
-            case 'offered_date':
-                return $this->db->
-                where('id',$args['deal_id'])->
-                update('deals',array('offered_date'=>$args['value']));
-
-            case 'closed_date':
-                return $this->db->
-                where('id',$args['deal_id'])->
-                update('deals',array('closed_date'=>$args['value']));
 
             case 'acres':
                 return $this->db->query("UPDATE
@@ -82,60 +72,29 @@ class deals_model extends CI_Model {
                      case 'createdToDate':
                         $this->db->where('created_date <',"$date[2]-$date[1]-$date[0]");
                      break;
-
-                     case 'offeredFromDate':
-                        $this->db->where('offered_date >',"$date[2]-$date[1]-$date[0]");
-                     break;
-                     case 'offeredToDate':
-                        $this->db->where('offered_date <',"$date[2]-$date[1]-$date[0]");
-                     break;
-                 
-                     case 'closedFromDate':
-                        $this->db->where('closed_date >',"$date[2]-$date[1]-$date[0]");
-                     break;
-                     case 'closedToDate':
-                        $this->db->where('closed_date <',"$date[2]-$date[1]-$date[0]");
-                     break;
                  }
              }
         }
         
         if( key_exists('to_created_date',$args) ){
-            $this->db->where('created_date <',$args['to_created_date']);
+            $this->db->where('created_date <',str_replace('-','',$args['to_created_date']));
         }
 
         if( key_exists('from_created_date',$args) ){
-            $this->db->where('created_date >',$args['from_created_date']);
+            $this->db->where('created_date >',str_replace('-','',$args['from_created_date']));
         }
 
-        if( key_exists('to_offered_date',$args) ){
-            $this->db->where('offered_date <',$args['to_offered_date']);
-        }
-
-        if( key_exists('from_offered_date',$args) ){
-            $this->db->where('offered_date >',$args['from_offered_date']);        
-        }
-        
-        if( key_exists('to_closed_date',$args) ){
-            $this->db->where('closed_date <',$args['to_closed_date']);
-        }
-        
-        if( key_exists('from_closed_date',$args) ){
-            $this->db->where('closed_date >',$args['from_closed_date']);
-        }
-
-        return $this->db->select('
+        return $this->db->select("
             deals.id,
             deals.seller_price,
             deals.deal_stage,
             deals.created_date,
-            deals.offered_date,
-            deals.closed_date,
 
             buyer_id,
             buyers.first_name buyer_first_name,
             buyers.last_name buyer_last_name,
             buyers.company_name buyer_company_name,
+            buyers.company_name buyer_label,
 
             owner_id,
             owners.first_name owner_first_name,
@@ -145,10 +104,13 @@ class deals_model extends CI_Model {
             agent_id,
             agents.first_name agent_first_name,
             agents.last_name agent_last_name,
+            CONCAT(agents.first_name, ' ', agents.last_name) AS agent_label,
+            agents.title agent_title,
+            agents.phone_number agent_phone_number,
 	
             properties.acres,
             properties.appraised_value appraised_value
-        ')->
+        ", false)->
         from('deals')->
         join('agents', 'deals.agent_id=agents.id', 'left')->
         join('properties', 'deals.property_id=properties.id', 'left')->
